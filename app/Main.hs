@@ -11,10 +11,11 @@ screenHeight = 650
 screenTitle :: String
 screenTitle = "Platformer"
 
--- Constantes para escalamento dos sprites (ainda n foi USADO)
-characterScaling, tileScaling :: Float
+-- Constantes para escalamento dos sprites 
+characterScaling, wallScaling, tileScaling :: Float
 characterScaling = 10
-tileScaling = 0.5
+wallScaling = 10
+tileScaling = 20
 
 -- Definição de tipos de dados para o Player
 data Player = Player
@@ -44,40 +45,82 @@ data Wall = Wall
     , wallPosition :: (Float, Float)
     }
 
+-- Function to load and scale the player's image from BMP file
+loadWallSprite :: Float -> IO Picture
+loadWallSprite scalingFactor = do
+    sprite <- loadBMP "./app/c_front.bmp"
+    let scaledSprite = scale scalingFactor scalingFactor sprite
+    return scaledSprite
+
 -- Lista inicial de paredes (um exemplo simples com uma única parede no chão)
-initialWallList :: [Wall]
-initialWallList =
-    [ Wall
-        { wallSprite = scale tileScaling tileScaling $ Color green $ rectangleSolid 128 32 -- Exemplo de parede como um retângulo verde escalonada
+initialWallList :: IO [Wall]
+initialWallList = do
+    sprite <- loadWallSprite wallScaling
+    return 
+        [ Wall
+        { wallSprite = sprite -- Exemplo de parede como um retângulo verde escalonada
         , wallPosition = (512, 32) -- Posição da parede no chão
         }
         , Wall
-        { wallSprite = Color green $ rectangleSolid 128 32
-        , wallPosition = (256, 32)
+        { wallSprite = Color green $ rectangleSolid 32 128
+        , wallPosition = (100, 100)
+        }]
+    
+    -- Definição de tipos de dados para Wall
+data Tile = Tile
+    { tileSprite :: Picture
+    , tilePosition :: (Float, Float)
+    }
+
+-- Function to load and scale the player's image from BMP file
+loadTileSprite :: Float -> IO Picture
+loadTileSprite scalingFactor = do
+    sprite <- loadBMP "./app/c_front.bmp"
+    let scaledSprite = scale scalingFactor scalingFactor sprite
+    return scaledSprite
+
+-- Lista inicial de chãos
+initialTileList :: IO [Tile]
+initialTileList = do
+    sprite <- loadTileSprite tileScaling
+    return 
+        [ Tile
+        { tileSprite = sprite -- Exemplo de parede como um retângulo verde escalonada
+        , tilePosition = (512, 32) -- Posição da parede no chão
         }
-    ]
+        , Tile
+        { tileSprite = Color green $ rectangleSolid 128 32
+        , tilePosition = (256, 32)
+        }]
 
 -- Definição de tipos de dados para o estado do jogo
 data GameState = GameState
-    { playerList :: [Player]
-    , wallList :: [Wall]
+    { 
+    playerList :: [Player], 
+    wallList :: [Wall],
+    tileList :: [Tile]
     }
 
--- Definição do estado inicial do jogo (usando o GameState)
+-- Initial game state (using GameState)
 initialState :: IO GameState
 initialState = do
     player <- initialPlayer
+    walls <- initialWallList
+    tiles <- initialTileList
     return GameState
-        { playerList = [player]
-        , wallList = initialWallList
+        { 
+        playerList = [player],
+        wallList = walls,
+        tileList = tiles
         }
 
 -- Função para renderizar o estado do jogo
 render :: GameState -> IO Picture
-render gameState = return $ pictures $ map renderPlayer (playerList gameState) ++ map renderWall (wallList gameState)
+render gameState = return $ pictures $ map renderPlayer (playerList gameState) ++ map renderWall (wallList gameState) ++ map renderTile (tileList gameState)
     where
         renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
         renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
+        renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile   
 
 -- Função para lidar com eventos de entrada
 handleEvent :: Event -> GameState -> IO GameState
