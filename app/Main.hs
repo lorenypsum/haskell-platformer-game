@@ -2,125 +2,198 @@
 import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
 
--- Constantes para largura, altura 
+-- Constantes para largura, altura
 screenWidth, screenHeight :: Int
 screenWidth = 1000
 screenHeight = 650
 
 -- Constante para título da tela
 screenTitle :: String
-screenTitle = "Platformer"
+screenTitle = "Cueio Lalao"
 
--- Constantes para escalamento dos sprites 
-characterScaling, wallScaling, tileScaling :: Float
+-- Constantes para escalamento dos sprites
+characterScaling, wallScaling, tileScaling, soilScaling :: Float
 characterScaling = 10
 wallScaling = 10
-tileScaling = 20
+tileScaling = 10
+soilScaling = 10
 
 -- Definição de tipos de dados para o Player
 data Player = Player
-    { playerSprite :: Picture
-    , playerPosition :: (Float, Float)
-    }
+  { playerSprite :: Picture,
+    playerPosition :: (Float, Float)
+  }
 
 -- Function to load and scale the player's image from BMP file
 loadPlayerSprite :: Float -> IO Picture
 loadPlayerSprite scalingFactor = do
-    sprite <- loadBMP "./app/c_front.bmp"
-    let scaledSprite = scale scalingFactor scalingFactor sprite
-    return scaledSprite
+  sprite <- loadBMP "./app/c_right.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
 
 -- Definição do jogador inicial
 initialPlayer :: IO Player
 initialPlayer = do
-    sprite <- loadPlayerSprite characterScaling  -- Load player image with character scaling
-    return Player
-        { playerSprite = sprite
-        , playerPosition = (0, 0)  -- Initial player position
-        }
+  sprite <- loadPlayerSprite characterScaling -- Load player image with character scaling
+  return
+    Player
+      { playerSprite = sprite,
+        playerPosition = (-350, -100) -- Initial player position
+      }
 
 -- Definição de tipos de dados para Wall
 data Wall = Wall
-    { wallSprite :: Picture
-    , wallPosition :: (Float, Float)
-    }
+  { wallSprite :: Picture,
+    wallPosition :: (Float, Float)
+  }
 
 -- Function to load and scale the player's image from BMP file
 loadWallSprite :: Float -> IO Picture
 loadWallSprite scalingFactor = do
-    sprite <- loadBMP "./app/c_front.bmp"
+  sprite <- loadBMP "./app/grass_wall.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
+
+-- Definição de tipos de dados para Sky
+data Sky = Sky
+    { skySprite :: Picture,
+      skyPosition :: (Float, Float)
+    }
+
+-- Function to load and scale the player's image from BMP file
+loadSkySprite :: Float -> IO Picture
+loadSkySprite scalingFactor = do
+    sprite <- loadBMP "./app/sky.bmp"
     let scaledSprite = scale scalingFactor scalingFactor sprite
     return scaledSprite
+
+initialSkyList :: IO [Sky]
+initialSkyList = do
+    sprite <- loadSkySprite 10
+    return
+        [ Sky
+            { skySprite = sprite,
+              skyPosition = (0, 0)
+            }
+        ]
+
 
 -- Lista inicial de paredes (um exemplo simples com uma única parede no chão)
 initialWallList :: IO [Wall]
 initialWallList = do
-    sprite <- loadWallSprite wallScaling
-    return 
-        [ Wall
-        { wallSprite = sprite -- Exemplo de parede como um retângulo verde escalonada
-        , wallPosition = (512, 32) -- Posição da parede no chão
+  sprite <- loadWallSprite wallScaling
+  return
+    [ Wall
+        { wallSprite = sprite, -- Exemplo de parede como um retângulo verde escalonada
+          wallPosition = (-500, 0) -- Posição da parede no chão
         }
-        , Wall
-        { wallSprite = Color green $ rectangleSolid 32 128
-        , wallPosition = (100, 100)
-        }]
-    
-    -- Definição de tipos de dados para Wall
+        -- , Wall
+        -- { wallSprite = sprite
+        -- , wallPosition = (300, 0)
+        -- }
+    ]
+
+-- Definição de tipos de dados para Wall
 data Tile = Tile
-    { tileSprite :: Picture
-    , tilePosition :: (Float, Float)
-    }
+  { tileSprite :: Picture,
+    tilePosition :: (Float, Float)
+  }
 
 -- Function to load and scale the player's image from BMP file
 loadTileSprite :: Float -> IO Picture
 loadTileSprite scalingFactor = do
-    sprite <- loadBMP "./app/c_front.bmp"
-    let scaledSprite = scale scalingFactor scalingFactor sprite
-    return scaledSprite
+  sprite <- loadBMP "./app/grass_floor.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
+
+loadTileSoilSprite :: Float -> IO Picture
+loadTileSoilSprite scalingFactor = do
+  sprite <- loadBMP "./app/soil_floor.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
+
+loadWaterSprite :: Float -> IO Picture
+loadWaterSprite scalingFactor = do
+  sprite <- loadBMP "./app/water.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
 
 -- Lista inicial de chãos
 initialTileList :: IO [Tile]
 initialTileList = do
-    sprite <- loadTileSprite tileScaling
-    return 
-        [ Tile
-        { tileSprite = sprite -- Exemplo de parede como um retângulo verde escalonada
-        , tilePosition = (512, 32) -- Posição da parede no chão
+  sprite <- loadTileSprite tileScaling
+  soilSprite <- loadTileSoilSprite soilScaling
+  waterSprite <- loadWaterSprite soilScaling
+  return
+    [ Tile
+        { tileSprite = waterSprite, -- Exemplo de solo
+          tilePosition = (-300, -300) -- Posição do chao
+        },
+        Tile
+        { tileSprite = waterSprite, -- Exemplo de solo
+          tilePosition = (300, -300) -- Posição do chao
+        },
+        Tile
+        { tileSprite = soilSprite, -- Exemplo de solo
+          tilePosition = (-300, -200) -- Posição do chao
+        },
+        Tile
+        { tileSprite = soilSprite, -- Exemplo de solo
+          tilePosition = (0, -200) -- Posição do chao
+        },
+        Tile
+        { tileSprite = soilSprite, -- Exemplo de solo
+          tilePosition = (300, -200) -- Posição do chao
+        },
+        Tile
+        { tileSprite = sprite,
+          tilePosition = (-100, -200)
+        },
+        Tile
+        { tileSprite = sprite,
+          tilePosition = (400, -200)
         }
-        , Tile
-        { tileSprite = Color green $ rectangleSolid 128 32
-        , tilePosition = (256, 32)
-        }]
+    ]
 
 -- Definição de tipos de dados para o estado do jogo
 data GameState = GameState
-    { 
-    playerList :: [Player], 
+  { skyList :: [Sky],
+    tileList :: [Tile],
     wallList :: [Wall],
-    tileList :: [Tile]
-    }
+    playerList :: [Player]
+  }
 
 -- Initial game state (using GameState)
 initialState :: IO GameState
 initialState = do
-    player <- initialPlayer
-    walls <- initialWallList
-    tiles <- initialTileList
-    return GameState
-        { 
-        playerList = [player],
+  sky <- initialSkyList
+  tiles <- initialTileList
+  walls <- initialWallList
+  player <- initialPlayer
+
+  return
+    GameState
+      { skyList = sky,
+        tileList = tiles,
         wallList = walls,
-        tileList = tiles
-        }
+        playerList = [player]
+      }
 
 -- Função para renderizar o estado do jogo
 render :: GameState -> IO Picture
-render gameState = return $ pictures $ map renderPlayer (playerList gameState) ++ map renderWall (wallList gameState) ++ map renderTile (tileList gameState)
-    where
-        renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
-        renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
-        renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile   
+render gameState =
+  return $
+    pictures $
+    map renderSky (skyList gameState)
+        ++ map renderWall (wallList gameState)
+        ++ map renderTile (tileList gameState)
+        ++ map renderPlayer (playerList gameState)
+     
+  where
+    renderSky sky = uncurry translate (skyPosition sky) $ skySprite sky
+    renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile
+    renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
+    renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
 
 -- Função para lidar com eventos de entrada
 handleEvent :: Event -> GameState -> IO GameState
@@ -130,18 +203,15 @@ handleEvent _ state = return state -- Por enquanto, não tratamos eventos
 update :: Float -> GameState -> IO GameState
 update _ state = return state -- Por enquanto, não atualizamos o estado
 
-
 -- Função principal para iniciar o jogo
 main :: IO ()
 main = do
-    initialState' <- initialState
-    playIO
-        (InWindow screenTitle (screenWidth, screenHeight) (100, 100)) -- Configurações da janela
-        (makeColorI 100 149 237 255) -- Cor de fundo (Cornflower Blue)
-        60 -- FPS (frames por segundo)
-        initialState' -- Estado inicial do jogo
-        render -- Função para renderizar o estado do jogo
-        handleEvent -- Função para lidar com eventos de entrada
-        update -- Função para atualizar o estado do jogo
-
-
+  initialState' <- initialState
+  playIO
+    (InWindow screenTitle (screenWidth, screenHeight) (100, 100)) -- Configurações da janela
+    (makeColorI 100 149 237 255) -- Cor de fundo (Cornflower Blue)
+    60 -- FPS (frames por segundo)
+    initialState' -- Estado inicial do jogo
+    render -- Função para renderizar o estado do jogo
+    handleEvent -- Função para lidar com eventos de entrada
+    update -- Função para atualizar o estado do jogo
