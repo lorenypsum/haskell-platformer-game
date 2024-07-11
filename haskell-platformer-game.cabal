@@ -70,7 +70,8 @@ executable haskell-platformer-game
     -- Other library packages from which modules are imported.
     build-depends:    base ^>=4.17.2.1,
                       gloss >= 1.13 && < 1.15,
-                      GLUT >= 2.7 && < 2.8
+                      GLUT >= 2.7 && < 2.8,
+                      JuicyPixels >= 3.3 && < 3.4,
     -- Directories containing source files.
     hs-source-dirs:   app
 
