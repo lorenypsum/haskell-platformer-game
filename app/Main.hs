@@ -12,11 +12,12 @@ screenTitle :: String
 screenTitle = "Cueio Lalao"
 
 -- Constantes para escalamento dos sprites
-characterScaling, wallScaling, tileScaling, soilScaling :: Float
+characterScaling, wallScaling, tileScaling, soilScaling, skyscaling :: Float
 characterScaling = 10
 wallScaling = 10
 tileScaling = 10
 soilScaling = 10
+skyscaling = 2
 
 -- Definição de tipos de dados para o Player
 data Player = Player
@@ -63,13 +64,13 @@ data Sky = Sky
 -- Function to load and scale the player's image from BMP file
 loadSkySprite :: Float -> IO Picture
 loadSkySprite scalingFactor = do
-    sprite <- loadBMP "./app/sky.bmp"
+    sprite <- loadBMP "./app/cloud_blue.bmp"
     let scaledSprite = scale scalingFactor scalingFactor sprite
     return scaledSprite
 
 initialSkyList :: IO [Sky]
 initialSkyList = do
-    sprite <- loadSkySprite 10
+    sprite <- loadSkySprite 1
     return
         [ Sky
             { skySprite = sprite,
