@@ -46,4 +46,10 @@ build-depends:
     cabal run
 ```
 
+7. Restart the language server
+    * Press: <kbd> ctrl + shift + p </kbd> 
+    * Type: `Restart Haskell LSP Server`
+    * Click on the option that appears
+    
+
 	

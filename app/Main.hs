@@ -2,8 +2,6 @@ module Main where
 
 import Graphics.Gloss
 
-
-
 -- Função principal que cria a janela e define o estado inicial
 main :: IO ()
 main = display (InWindow "Hello, Gloss!" (800, 600) (10, 10)) white picture
