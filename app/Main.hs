@@ -218,11 +218,10 @@ render :: GameState -> IO Picture
 render gameState =
   return $
     pictures $
-    map renderSky (skyList gameState)
-    ++ map renderTile (tileList gameState)
-        ++  map renderWall (wallList gameState)
-        ++ map renderPlayer (playerList gameState)
-     
+      map renderSky (skyList gameState)
+        ++ map renderTile (tileList gameState)
+        ++ map renderWall (wallList gameState)
+        ++ map renderPlayer (playerList gameState)  
   where
     renderSky sky = uncurry translate (skyPosition sky) $ skySprite sky
     renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
