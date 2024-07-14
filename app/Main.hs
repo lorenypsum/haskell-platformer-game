@@ -15,16 +15,16 @@ screenTitle = "Cueio Lalao"
 characterScaling, chickenScaling, cloudScaling, eggScaling, mountainScaling, platformScaling, elementsScaling, skyScaling, tileScaling, treeScaling, wallScaling, waterScaling:: Float
 characterScaling = 5
 chickenScaling = 5
-cloudScaling = 5
+cloudScaling = 2
 eggScaling = 0.2
-mountainScaling = 5
-platformScaling = 5
+mountainScaling = 1
+platformScaling = 4
 elementsScaling = 5
-skyScaling = 1.1
+skyScaling = 1
 tileScaling = 5
 treeScaling = 5
 wallScaling = 5
-waterScaling = 5
+waterScaling = 6
 
 -- Função genérica para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
@@ -83,7 +83,7 @@ loadAnthillCakeBack1, loadAnthillCakeBack2, loadAnthillCakeBack3, loadChocoMount
 loadAnthillCakeBack1 = loadSprite mountainScaling "./app/mountains/anthill_cake_back_1.bmp"
 loadAnthillCakeBack2 = loadSprite mountainScaling "./app/mountains/anthill_cake_back_2.bmp"
 loadAnthillCakeBack3 = loadSprite mountainScaling "./app/mountains/anthill_cake_back_3.bmp"
-loadChocoMountain = loadSprite mountainScaling "./app/mountains/choco_mountain.bmp"
+loadChocoMountain = loadSprite 5 "./app/mountains/choco_mountain.bmp"
 loadMountains = loadSprite mountainScaling "./app/mountains/mountains.bmp"
 
 -- Carregar platforms sprites
@@ -133,7 +133,6 @@ loadChocoWallSmall = loadSprite wallScaling "./app/walls/choco_wall_small.bmp"
 -- Carregar water sprites
 loadChocoWater:: IO Picture
 loadChocoWater = loadSprite waterScaling "./app/water/choco_water.bmp"
-
 
 -- Definição de tipos de dados para o Player
 data Player = Player
@@ -216,11 +215,12 @@ data Water = Water
 -- Definição do Player inicial
 initialPlayerList :: IO [Player]
 initialPlayerList = do
-  spritePlayerLeft <- loadPlayerLeft
+  -- spritePlayerLeft <- loadPlayerLeft
+  spritePlayerRight <- loadPlayerRight
   -- spritePlayerWalkLeftLeftLeg <- loadPlayerWalkLeftLeftLeg
   -- spritePlayerWalkLeftRightLeg <- loadPlayerWalkLeftRightLeg
-  return 
-    [ Player {playerSprite = spritePlayerLeft, playerPosition = (-400, -150)} 
+  return
+    [ Player {playerSprite = spritePlayerRight, playerPosition = (-400, -130)}
       -- Player {playerSprite = spritePlayerWalkLeftLeftLeg, playerPosition = (-300, -150)},
       -- Player {playerSprite = spritePlayerWalkLeftRightLeg, playerPosition = (-200, -150)}
     ]
@@ -233,7 +233,7 @@ initialChickenList = do
   -- spriteChickenFly3 <- loadChickenFly3
   -- spriteChickenFly4 <- loadChickenFly4
   return
-    [ Chicken {chickenSprite = spriteChickenFly1, chickenPosition = (400, 0)}
+    [ Chicken {chickenSprite = spriteChickenFly1, chickenPosition = (-200, 100)}
       -- Chicken {chickenSprite = spriteChickenFly2, chickenPosition = (-400, 0)},
       -- Chicken {chickenSprite = spriteChickenFly3, chickenPosition = (400, 0)},
       -- Chicken {chickenSprite = spriteChickenFly4, chickenPosition = (-400, 0)}
@@ -243,15 +243,15 @@ initialChickenList = do
 initialCloudList :: IO [Cloud]
 initialCloudList = do
   spriteCloud1 <- loadCloud1
-  -- spriteCloud2 <- loadCloud2
+  spriteCloud2 <- loadCloud2
   -- spriteCloud3 <- loadCloud3
   -- spriteClousBack <- loadClousBack
   -- spriteCupcake <- loadCupcake
   -- spritePropsCloud <- loadPropsCloud
   -- spriteYellowCloud <- loadYellowCloud
   return
-    [ Cloud {cloudSprite = spriteCloud1, cloudPosition = (0, 200)}
-      -- Cloud {cloudSprite = spriteCloud2, cloudPosition = (100, 250)},
+    [ Cloud {cloudSprite = spriteCloud1, cloudPosition = (-250, 250)},
+      Cloud {cloudSprite = spriteCloud2, cloudPosition = (200, 250)}
       -- Cloud {cloudSprite = spriteCloud3, cloudPosition = (200, 300)},
       -- Cloud {cloudSprite = spriteClousBack, cloudPosition = (300, 350)},
       -- Cloud {cloudSprite = spriteCupcake, cloudPosition = (400, 400)},
@@ -270,7 +270,7 @@ initialEggList = do
   -- spriteEasterEggRabbit <- loadEasterEggRabbit
   -- spriteEggsBasket <- loadEggsBasket
   return
-    [ Egg {eggSprite = spriteEasterEgg1, eggPosition = (0, 0)}
+    [ Egg {eggSprite = spriteEasterEgg1, eggPosition = (0, 150)}
       -- Egg {eggSprite = spriteEasterEgg2, eggPosition = (50, 50)},
       -- Egg {eggSprite = spriteEasterEgg3, eggPosition = (100, 100)},
       -- Egg {eggSprite = spriteEasterEgg4, eggPosition = (150, 150)},
@@ -282,14 +282,14 @@ initialEggList = do
 -- Definição do Element inicial
 initialElementList :: IO [Element]
 initialElementList = do
-  spriteBrigadeiro <- loadBrigadeiro
-  -- spriteChocoBall <- loadChocoBall
+  -- spriteBrigadeiro <- loadBrigadeiro
+  spriteChocoBall <- loadChocoBall
   -- spriteChocoDonut <- loadChocoDonut
   -- spriteDonutStrawberry <- loadDonutStrawberry
   -- spriteMilk <- loadMilk
   return
-    [ Element {elementSprite = spriteBrigadeiro, elementPosition = (0, 0)}
-      -- Element {elementSprite = spriteChocoBall, elementPosition = (50, 50)},
+    [ -- Element {elementSprite = spriteBrigadeiro, elementPosition = (-200, -200)},
+      Element {elementSprite = spriteChocoBall, elementPosition = (-250, -150)}
       -- Element {elementSprite = spriteChocoDonut, elementPosition = (100, 100)},
       -- Element {elementSprite = spriteDonutStrawberry, elementPosition = (150, 150)},
       -- Element {elementSprite = spriteMilk, elementPosition = (200, 200)}
@@ -298,48 +298,50 @@ initialElementList = do
 -- Definição do Mountain inicial
 initialMountainList :: IO [Mountain]
 initialMountainList = do
-  spriteAnthillCakeBack1 <- loadAnthillCakeBack1
+  -- spriteAnthillCakeBack1 <- loadAnthillCakeBack1
   -- spriteAnthillCakeBack2 <- loadAnthillCakeBack2
   -- spriteAnthillCakeBack3 <- loadAnthillCakeBack3
+  spriteMountains <- loadMountains
   -- spriteChocoMountain <- loadChocoMountain
-  -- spriteMountains <- loadMountains
   return
-    [ Mountain {mountainSprite = spriteAnthillCakeBack1, mountainPosition = (0, 0)}
-      -- Mountain {mountainSprite = spriteAnthillCakeBack2, mountainPosition = (50, 50)},
-      -- Mountain {mountainSprite = spriteAnthillCakeBack3, mountainPosition = (100, 100)},
-      -- Mountain {mountainSprite = spriteChocoMountain, mountainPosition = (150, 150)},
-      -- Mountain {mountainSprite = spriteMountains, mountainPosition = (200, 200)}
+    [ 
+      Mountain {mountainSprite = spriteMountains, mountainPosition = (0, 100)}
+      -- Mountain {mountainSprite = spriteAnthillCakeBack1, mountainPosition = (-300, 0)},
+      -- Mountain {mountainSprite = spriteAnthillCakeBack2, mountainPosition = (0, 0)},
+      -- Mountain {mountainSprite = spriteAnthillCakeBack3, mountainPosition = (300, 0)}
+      -- Mountain {mountainSprite = spriteChocoMountain, mountainPosition = (-300, 100)},
+      -- Mountain {mountainSprite = spriteChocoMountain, mountainPosition = (0, 100)},
+      -- Mountain {mountainSprite = spriteChocoMountain, mountainPosition = (300, 100)}
     ]
 
 -- Definição do Platform inicial
 initialPlatformList :: IO [Platform]
 initialPlatformList = do
-  spriteChocoPlatBigFlat <- loadChocoPlatBigFlat
+  -- spriteChocoPlatBigFlat <- loadChocoPlatBigFlat
   -- spriteChocoPlatBig <- loadChocoPlatBig
-  -- spriteChocoPlatSmallFlat <- loadChocoPlatSmallFlat
   -- spriteChocoPlatSmall <- loadChocoPlatSmall
-  -- spriteChocoPlatform <- loadChocoPlatform
   -- spriteChocoSoil <- loadChocoSoil
-  -- spritePlatform <- loadPlatform
+  -- spriteChocoPlatform <- loadChocoPlatform
+  spritePlatform <- loadPlatform
   return
-    [ Platform {platformSprite = spriteChocoPlatBigFlat, platformPosition = (0, 0)}
+    [ -- Platform {platformSprite = spriteChocoPlatBigFlat, platformPosition = (0, 0)},
       -- Platform {platformSprite = spriteChocoPlatBig, platformPosition = (50, 50)},
-      -- Platform {platformSprite = spriteChocoPlatSmallFlat, platformPosition = (100, 100)},
       -- Platform {platformSprite = spriteChocoPlatSmall, platformPosition = (150, 150)},
       -- Platform {platformSprite = spriteChocoPlatform, platformPosition = (200, 200)},
       -- Platform {platformSprite = spriteChocoSoil, platformPosition = (250, 250)},
-      -- Platform {platformSprite = spritePlatform, platformPosition = (300, 300)}
-    ]   
+      Platform {platformSprite = spritePlatform, platformPosition = (-400, -250)},
+      Platform {platformSprite = spritePlatform, platformPosition = (400, -250)}
+    ]
 
 -- Definição do Sky inicial
 initialSkyList :: IO [Sky]
 initialSkyList = do
-  spriteCloudSky <- loadCloudSky
+  -- spriteCloudSky <- loadCloudSky
   spriteCottonCloudBack <- loadCottonCloudBack
   spriteCottonCloudFront <- loadCottonCloudFront
   spriteCottonCloudMiddle <- loadCottonCloudMiddle
   return
-    [ Sky {skySprite = spriteCloudSky, skyPosition = (0, 200)},
+    [ -- Sky {skySprite = spriteCloudSky, skyPosition = (0, 200)},
       Sky {skySprite = spriteCottonCloudBack, skyPosition = (0, 0)},
       Sky {skySprite = spriteCottonCloudMiddle, skyPosition = (0, -100)},
       Sky {skySprite = spriteCottonCloudFront, skyPosition = (0, -200)}
@@ -349,10 +351,10 @@ initialSkyList = do
 initialSpikeList :: IO [Spike]
 initialSpikeList = do
   spriteChocoSpike2 <- loadChocoSpike2
-  -- spriteChocoSpike <- loadChocoSpike
+  spriteChocoSpike <- loadChocoSpike
   return
-    [ Spike {spikeSprite = spriteChocoSpike2, spikePosition = (0, 0)}
-      -- Spike {spikeSprite = spriteChocoSpike, spikePosition = (50, 50)}
+    [ Spike {spikeSprite = spriteChocoSpike2, spikePosition = (400, -125)},
+      Spike {spikeSprite = spriteChocoSpike, spikePosition = (300, 70)}
     ]
 
 -- Definição do Tile inicial
@@ -362,13 +364,13 @@ initialTileList = do
   -- spriteChocoTile <- loadChocoTile
   -- spriteCookieTile <- loadCookieTile
   -- spriteStrawberryBar <- loadStrawberryBar
-  -- spriteChocoBar <- loadChocoBar
+  spriteChocoBar <- loadChocoBar
   return
-    [ Tile {tileSprite = spriteSmallFlatPlatform, tilePosition = (0, 0)}
+    [ Tile {tileSprite = spriteSmallFlatPlatform, tilePosition = (0, 0)},
       -- Tile {tileSprite = spriteChocoTile, tilePosition = (50, 50)},
       -- Tile {tileSprite = spriteCookieTile, tilePosition = (100, 100)},
-      -- Tile {tileSprite = spriteStrawberryBar, tilePosition = (150, 150)},
-      -- Tile {tileSprite = spriteChocoBar, tilePosition = (200, 200)}
+      -- Tile {tileSprite = spriteStrawberryBar, tilePosition = (-200, 0)},
+      Tile {tileSprite = spriteChocoBar, tilePosition = (300, 150)}
     ]
 
 -- Definição do Tree inicial
@@ -380,8 +382,8 @@ initialTreeList = do
   -- spriteChocoTree <- loadChocoTree
   -- spriteSakuraMochi <- loadSakuraMochi
   return
-    [ Tree {treeSprite = spriteChocoLollipop, treePosition = (0, 0)}
-      -- Tree {treeSprite = spriteChocoTree2, treePosition = (50, 50)},
+    [ Tree {treeSprite = spriteChocoLollipop, treePosition = (-200, -90)}
+      -- Tree {treeSprite = spriteChocoTree2, treePosition = (-150, -90)}
       -- Tree {treeSprite = spriteChocoTree3, treePosition = (100, 100)},
       -- Tree {treeSprite = spriteChocoTree, treePosition = (150, 150)},
       -- Tree {treeSprite = spriteSakuraMochi, treePosition = (200, 200)}
@@ -393,7 +395,7 @@ initialWallList = do
   spriteChocoWallBig <- loadChocoWallBig
   -- spriteChocoWallSmall <- loadChocoWallSmall
   return
-    [ Wall {wallSprite = spriteChocoWallBig, wallPosition = (0, 0)}
+    [ Wall {wallSprite = spriteChocoWallBig, wallPosition = (300, -70)}
       -- Wall {wallSprite = spriteChocoWallSmall, wallPosition = (50, 50)}
     ]
 
@@ -402,12 +404,12 @@ initialWaterList :: IO [Water]
 initialWaterList = do
   spriteChocoWater <- loadChocoWater
   return
-    [ Water {waterSprite = spriteChocoWater, waterPosition = (0, 0)}
+    [ Water {waterSprite = spriteChocoWater, waterPosition = (0, -270)}
     ]
 
 -- Definição de tipos de dados para o estado do jogo
 data GameState = GameState
-  { 
+  {
     playerList :: [Player],
     chickenList :: [Chicken],
     cloudList :: [Cloud],
@@ -441,7 +443,7 @@ initialState = do
   water <- initialWaterList
   return
     GameState
-      { 
+      {
         playerList = player,
         chickenList = chickens,
         cloudList = clouds,
@@ -463,42 +465,42 @@ render gameState =
   return $
     pictures $
       concat
-        [ map renderSky (skyList gameState)
-          -- map renderMountain (mountainList gameState),
-          -- map renderCloud (cloudList gameState),
-          -- map renderWater (waterList gameState),
-          -- map renderWall (wallList gameState),
-          -- map renderPlatform (platformList gameState),
-          -- map renderTile (tileList gameState),
-          -- map renderElement (elementList gameState),
-          -- map renderTree (treeList gameState),
-          -- map renderSpike (spikeList gameState),
-          -- map renderEggs (eggList gameState),
-          -- map renderChicken (chickenList gameState),
-          -- map renderPlayer (playerList gameState)          
+        [ map renderMountain (mountainList gameState),
+          map renderSky (skyList gameState),
+          map renderCloud (cloudList gameState),
+          map renderWater (waterList gameState),
+          map renderWall (wallList gameState),
+          map renderPlatform (platformList gameState),
+          map renderTile (tileList gameState),
+          map renderElement (elementList gameState),
+          map renderTree (treeList gameState),
+          map renderSpike (spikeList gameState),
+          map renderEggs (eggList gameState),
+          map renderChicken (chickenList gameState),
+          map renderPlayer (playerList gameState)          
         ]
   where
     renderSky sky = uncurry translate (skyPosition sky) $ skySprite sky
-    -- renderMountain mountain = uncurry translate (mountainPosition mountain) $ mountainSprite mountain
-    -- renderCloud cloud = uncurry translate (cloudPosition cloud) $ cloudSprite cloud
-    -- renderWater water = uncurry translate (waterPosition water) $ waterSprite water
-    -- renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
-    -- renderPlatform platform = uncurry translate (platformPosition platform) $ platformSprite platform
-    -- renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile
-    -- renderElement element = uncurry translate (elementPosition element) $ elementSprite element
-    -- renderTree tree = uncurry translate (treePosition tree) $ treeSprite tree
-    -- renderSpike spike = uncurry translate (spikePosition spike) $ spikeSprite spike
-    -- renderEggs egg = uncurry translate (eggPosition egg) $ eggSprite egg
-    -- renderChicken chicken = uncurry translate (chickenPosition chicken) $ chickenSprite chicken
-    -- renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
-    
+    renderMountain mountain = uncurry translate (mountainPosition mountain) $ mountainSprite mountain
+    renderCloud cloud = uncurry translate (cloudPosition cloud) $ cloudSprite cloud
+    renderWater water = uncurry translate (waterPosition water) $ waterSprite water
+    renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
+    renderPlatform platform = uncurry translate (platformPosition platform) $ platformSprite platform
+    renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile
+    renderElement element = uncurry translate (elementPosition element) $ elementSprite element
+    renderTree tree = uncurry translate (treePosition tree) $ treeSprite tree
+    renderSpike spike = uncurry translate (spikePosition spike) $ spikeSprite spike
+    renderEggs egg = uncurry translate (eggPosition egg) $ eggSprite egg
+    renderChicken chicken = uncurry translate (chickenPosition chicken) $ chickenSprite chicken
+    renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
+
 -- Função para lidar com eventos de entrada
 handleEvent :: Event -> GameState -> IO GameState
-handleEvent _ state = return state -- Por enquanto, não tratamos eventos
+handleEvent _ = return -- Por enquanto, não tratamos eventos
 
 -- Função para atualizar o estado do jogo
 update :: Float -> GameState -> IO GameState
-update _ state = return state -- Por enquanto, não atualizamos o estado
+update _ = return -- Por enquanto, não atualizamos o estado
 
 -- Função principal para iniciar o jogo
 main :: IO ()
@@ -506,7 +508,7 @@ main = do
   initialState' <- initialState
   playIO
     (InWindow screenTitle (screenWidth, screenHeight) (100, 100)) -- Configurações da janela
-    (makeColorI 243 229 171 255) -- Cor de fundo (Cornflower Blue)
+    (makeColorI 185 213 188 255) -- Cor de fundo (Cornflower Blue)
     60 -- FPS (frames por segundo)
     initialState' -- Estado inicial do jogo
     render -- Função para renderizar o estado do jogo
