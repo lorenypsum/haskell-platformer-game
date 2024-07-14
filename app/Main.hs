@@ -12,10 +12,19 @@ screenTitle :: String
 screenTitle = "Cueio Lalao"
 
 -- Constantes para escalamento dos sprites
-characterScaling, wallScaling, tileScaling, soilScaling :: Float
-characterScaling = 5
-wallScaling = 5
-tileScaling = 5
+characterScaling, chickenScaling, cloudScalling, eggScalling, mountainScalling, platformScaling, elementsScalling, skyScaliung, tileScaling, treeScaling, wallScaling, waterScaling, soilScaling :: Float
+characterScaling = 5 
+chickenScaling = 5 
+cloudScalling = 5 
+eggScalling = 5 
+mountainScalling = 5 
+platformScaling = 5 
+elementsScalling = 5 
+skyScaliung = 5 
+tileScaling = 5 
+treeScaling = 5 
+wallScaling = 5 
+waterScaling = 5 
 soilScaling = 5
 
 -- Definição de tipos de dados para o Player
@@ -27,7 +36,7 @@ data Player = Player
 -- Function to load and scale the player's image from BMP file
 loadPlayerSprite :: Float -> IO Picture
 loadPlayerSprite scalingFactor = do
-  sprite <- loadBMP "./app/c_right.bmp"
+  sprite <- loadBMP "./app/character/c_right.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
@@ -38,7 +47,7 @@ initialPlayer = do
   return
     Player
       { playerSprite = sprite,
-        playerPosition = (-400, -200) -- Initial player position
+        playerPosition = (-400, -150) -- Initial player position
       }
 
 -- Definição de tipos de dados para Sky
@@ -50,17 +59,43 @@ data Sky = Sky
 -- Function to load and scale the player's image from BMP file
 loadSkySprite :: Float -> IO Picture
 loadSkySprite scalingFactor = do
-    sprite <- loadBMP "./app/cloud.bmp"
+    sprite <- loadBMP "./app/sky/cloud_violet.bmp"
+    let scaledSprite = scale scalingFactor scalingFactor sprite
+    return scaledSprite
+
+-- Function to load and scale the player's image from BMP file
+loadEggSprite :: Float -> IO Picture
+loadEggSprite scalingFactor = do
+    sprite <- loadBMP "./app/eggs/easter_egg_rabbit.bmp"
+    let scaledSprite = scale scalingFactor scalingFactor sprite
+    return scaledSprite
+
+-- Function to load and scale the player's image from BMP file
+loadCupCakeSprite :: Float -> IO Picture
+loadCupCakeSprite scalingFactor = do
+    sprite <- loadBMP "./app/clouds/cupcake.bmp"
     let scaledSprite = scale scalingFactor scalingFactor sprite
     return scaledSprite
 
 initialSkyList :: IO [Sky]
 initialSkyList = do
     sprite <- loadSkySprite 1
+    spriteEgg <- loadEggSprite 0.2
+    sprite <- loadSkySprite 1
+    spriteCupCake <- loadCupCakeSprite 2
     return
         [ Sky
             { skySprite = sprite,
-              skyPosition = (200, 0)
+              skyPosition = (0, 0)
+            },
+            Sky
+            { skySprite = spriteEgg,
+              skyPosition = (0, 50)
+            }
+            ,
+            Sky
+            { skySprite = spriteCupCake,
+              skyPosition = (-300, 100)
             }
         ]
 
@@ -73,7 +108,7 @@ data Wall = Wall
 -- Function to load and scale the player's image from BMP file
 loadWallSprite :: Float -> IO Picture
 loadWallSprite scalingFactor = do
-  sprite <- loadBMP "./app/wall_p.bmp"
+  sprite <- loadBMP "./app/wall/choco_wall_big.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
@@ -86,10 +121,14 @@ initialWallList = do
         { wallSprite = sprite, -- Exemplo de parede como um retângulo verde escalonada
           wallPosition = (300, 0) -- Posição da parede no chão
         }
-        -- , Wall
-        -- { wallSprite = sprite
-        -- , wallPosition = (300, 0)
-        -- }
+        , Wall
+        { wallSprite = sprite
+        , wallPosition = (-300, -300)
+        }
+        , Wall
+        { wallSprite = sprite
+        , wallPosition = (300, -300)
+        }
     ]
 
 -- Definição de tipos de dados para Wall
@@ -101,19 +140,19 @@ data Tile = Tile
 -- Function to load and scale the player's image from BMP file
 loadTileSprite :: Float -> IO Picture
 loadTileSprite scalingFactor = do
-  sprite <- loadBMP "./app/grass_floor.bmp"
+  sprite <- loadBMP "./app/platforms/choco_plat_big.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
 loadTileSoilSprite :: Float -> IO Picture
 loadTileSoilSprite scalingFactor = do
-  sprite <- loadBMP "./app/soil_grass.bmp"
+  sprite <- loadBMP "./app/platforms/choco_soil.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
 loadWaterSprite :: Float -> IO Picture
 loadWaterSprite scalingFactor = do
-  sprite <- loadBMP "./app/water.bmp"
+  sprite <- loadBMP "./app/water/choco_water.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
@@ -127,6 +166,14 @@ initialTileList = do
     [  Tile
         { tileSprite = waterSprite, -- Exemplo de solo
           tilePosition = (0, -300) -- Posição do chao
+        },
+        Tile
+        { tileSprite = waterSprite, -- Exemplo de solo
+          tilePosition = (-100, -300) -- Posição do chao
+        },
+        Tile
+        { tileSprite = waterSprite, -- Exemplo de solo
+          tilePosition = (100, -300) -- Posição do chao
         },
       Tile
         { tileSprite = soilSprite, -- Exemplo de solo
@@ -172,14 +219,14 @@ render gameState =
   return $
     pictures $
     map renderSky (skyList gameState)
+    ++ map renderTile (tileList gameState)
         ++  map renderWall (wallList gameState)
-        ++ map renderTile (tileList gameState)
         ++ map renderPlayer (playerList gameState)
      
   where
     renderSky sky = uncurry translate (skyPosition sky) $ skySprite sky
-    renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile
     renderWall wall = uncurry translate (wallPosition wall) $ wallSprite wall
+    renderTile tile = uncurry translate (tilePosition tile) $ tileSprite tile
     renderPlayer player = uncurry translate (playerPosition player) $ playerSprite player
 
 -- Função para lidar com eventos de entrada
