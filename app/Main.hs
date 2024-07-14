@@ -12,12 +12,11 @@ screenTitle :: String
 screenTitle = "Cueio Lalao"
 
 -- Constantes para escalamento dos sprites
-characterScaling, wallScaling, tileScaling, soilScaling, skyscaling :: Float
-characterScaling = 10
-wallScaling = 10
-tileScaling = 10
-soilScaling = 10
-skyscaling = 2
+characterScaling, wallScaling, tileScaling, soilScaling :: Float
+characterScaling = 5
+wallScaling = 5
+tileScaling = 5
+soilScaling = 5
 
 -- Definição de tipos de dados para o Player
 data Player = Player
@@ -39,21 +38,8 @@ initialPlayer = do
   return
     Player
       { playerSprite = sprite,
-        playerPosition = (-350, -100) -- Initial player position
+        playerPosition = (-400, -200) -- Initial player position
       }
-
--- Definição de tipos de dados para Wall
-data Wall = Wall
-  { wallSprite :: Picture,
-    wallPosition :: (Float, Float)
-  }
-
--- Function to load and scale the player's image from BMP file
-loadWallSprite :: Float -> IO Picture
-loadWallSprite scalingFactor = do
-  sprite <- loadBMP "./app/grass_wall.bmp"
-  let scaledSprite = scale scalingFactor scalingFactor sprite
-  return scaledSprite
 
 -- Definição de tipos de dados para Sky
 data Sky = Sky
@@ -64,7 +50,7 @@ data Sky = Sky
 -- Function to load and scale the player's image from BMP file
 loadSkySprite :: Float -> IO Picture
 loadSkySprite scalingFactor = do
-    sprite <- loadBMP "./app/cloud_blue.bmp"
+    sprite <- loadBMP "./app/cloud.bmp"
     let scaledSprite = scale scalingFactor scalingFactor sprite
     return scaledSprite
 
@@ -74,10 +60,22 @@ initialSkyList = do
     return
         [ Sky
             { skySprite = sprite,
-              skyPosition = (0, 0)
+              skyPosition = (200, 0)
             }
         ]
 
+-- Definição de tipos de dados para Wall
+data Wall = Wall
+  { wallSprite :: Picture,
+    wallPosition :: (Float, Float)
+  }
+
+-- Function to load and scale the player's image from BMP file
+loadWallSprite :: Float -> IO Picture
+loadWallSprite scalingFactor = do
+  sprite <- loadBMP "./app/wall_p.bmp"
+  let scaledSprite = scale scalingFactor scalingFactor sprite
+  return scaledSprite
 
 -- Lista inicial de paredes (um exemplo simples com uma única parede no chão)
 initialWallList :: IO [Wall]
@@ -86,7 +84,7 @@ initialWallList = do
   return
     [ Wall
         { wallSprite = sprite, -- Exemplo de parede como um retângulo verde escalonada
-          wallPosition = (-500, 0) -- Posição da parede no chão
+          wallPosition = (300, 0) -- Posição da parede no chão
         }
         -- , Wall
         -- { wallSprite = sprite
@@ -109,7 +107,7 @@ loadTileSprite scalingFactor = do
 
 loadTileSoilSprite :: Float -> IO Picture
 loadTileSoilSprite scalingFactor = do
-  sprite <- loadBMP "./app/soil_floor.bmp"
+  sprite <- loadBMP "./app/soil_grass.bmp"
   let scaledSprite = scale scalingFactor scalingFactor sprite
   return scaledSprite
 
@@ -126,33 +124,21 @@ initialTileList = do
   soilSprite <- loadTileSoilSprite soilScaling
   waterSprite <- loadWaterSprite soilScaling
   return
-    [ Tile
+    [  Tile
         { tileSprite = waterSprite, -- Exemplo de solo
+          tilePosition = (0, -300) -- Posição do chao
+        },
+      Tile
+        { tileSprite = soilSprite, -- Exemplo de solo
           tilePosition = (-300, -300) -- Posição do chao
         },
         Tile
-        { tileSprite = waterSprite, -- Exemplo de solo
+        { tileSprite = soilSprite, -- Exemplo de solo
           tilePosition = (300, -300) -- Posição do chao
         },
         Tile
-        { tileSprite = soilSprite, -- Exemplo de solo
-          tilePosition = (-300, -200) -- Posição do chao
-        },
-        Tile
-        { tileSprite = soilSprite, -- Exemplo de solo
-          tilePosition = (0, -200) -- Posição do chao
-        },
-        Tile
-        { tileSprite = soilSprite, -- Exemplo de solo
-          tilePosition = (300, -200) -- Posição do chao
-        },
-        Tile
         { tileSprite = sprite,
-          tilePosition = (-100, -200)
-        },
-        Tile
-        { tileSprite = sprite,
-          tilePosition = (400, -200)
+          tilePosition = (0, -100)
         }
     ]
 
@@ -186,7 +172,7 @@ render gameState =
   return $
     pictures $
     map renderSky (skyList gameState)
-        ++ map renderWall (wallList gameState)
+        ++  map renderWall (wallList gameState)
         ++ map renderTile (tileList gameState)
         ++ map renderPlayer (playerList gameState)
      
@@ -210,7 +196,7 @@ main = do
   initialState' <- initialState
   playIO
     (InWindow screenTitle (screenWidth, screenHeight) (100, 100)) -- Configurações da janela
-    (makeColorI 100 149 237 255) -- Cor de fundo (Cornflower Blue)
+    (makeColorI 155 212 195 255) -- Cor de fundo (Cornflower Blue)
     60 -- FPS (frames por segundo)
     initialState' -- Estado inicial do jogo
     render -- Função para renderizar o estado do jogo
