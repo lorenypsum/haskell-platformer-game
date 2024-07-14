@@ -12,14 +12,14 @@ screenTitle :: String
 screenTitle = "Cueio Lalao"
 
 -- Constantes para escalamento dos sprites
-characterScaling, chickenScaling, cloudScalling, eggScalling, mountainScalling, platformScaling, elementsScalling, skyScaliung, tileScaling, treeScaling, wallScaling, waterScaling, soilScaling :: Float
+characterScaling, chickenScaling, cloudScaling, eggScaling, mountainScaling, platformScaling, elementsScaling, skyScaliung, tileScaling, treeScaling, wallScaling, waterScaling, soilScaling :: Float
 characterScaling = 5 
 chickenScaling = 5 
-cloudScalling = 5 
-eggScalling = 5 
-mountainScalling = 5 
+cloudScaling = 5 
+eggScaling = 5 
+mountainScaling = 5 
 platformScaling = 5 
-elementsScalling = 5 
+elementsScaling = 5 
 skyScaliung = 5 
 tileScaling = 5 
 treeScaling = 5 
@@ -81,7 +81,6 @@ initialSkyList :: IO [Sky]
 initialSkyList = do
     sprite <- loadSkySprite 1
     spriteEgg <- loadEggSprite 0.2
-    sprite <- loadSkySprite 1
     spriteCupCake <- loadCupCakeSprite 2
     return
         [ Sky
