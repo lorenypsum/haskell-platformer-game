@@ -315,9 +315,21 @@ initialState = do
 drawEntity :: GameEntity -> Picture
 drawEntity entity = uncurry translate (entityPosition entity) (entitySprite entity)
 
+-- Função para redimensionar o background
+resizeBackground :: Picture -> Float -> Float -> Picture
+resizeBackground bg windowWidth windowHeight =
+  let screenWidth = 1000  -- Largura original da tela
+      screenHeight = 650  -- Altura original da tela
+      scaleX = windowWidth / screenWidth
+      scaleY = windowHeight / screenHeight
+  in scale scaleX scaleY bg
+
 -- Função para renderizar o estado do jogo
 render :: GameState -> Picture
-render state = pictures $ background state : concat
+render state =
+  let scaledBackground = resizeBackground (background state) (fromIntegral screenWidth) (fromIntegral screenHeight)
+  in pictures $
+      scaledBackground : concat
       [ map drawEntity (platformList state),
         map drawEntity (eggList state),
         map drawEntity (playerList state),
