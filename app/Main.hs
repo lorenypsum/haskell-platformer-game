@@ -114,13 +114,19 @@ handleEvent (EventKey key keyState _ _) state =
 handleEvent _ state = return state
 
 -- Função para atualizar o estado do jogo
-update :: Float -> GameState -> IO GameState
-update _deltaTime state = do
+updatePlayerMoviment :: Float -> GameState -> IO GameState
+updatePlayerMoviment _deltaTime state = do
   let (vx, vy) = playerVelocity state
       (px, py) = entityPosition (player state)
+      -- Calcula a nova posição do jogador com base na velocidade e no tempo
       newPlayerPos = (px + vx, py + vy)
       updatedPlayer = (player state) { entityPosition = newPlayerPos }
   return $ state { player = updatedPlayer }
+
+updateGame :: Float -> GameState -> IO GameState
+--chamar a função update
+updateGame deltaTime state = do
+  updatePlayerMoviment deltaTime state
 
 -- Função principal do jogo
 main :: IO ()
@@ -133,4 +139,4 @@ main = do
     initialState'
     (return . render)
     handleEvent
-    update
+    updateGame
