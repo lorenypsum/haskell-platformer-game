@@ -35,15 +35,18 @@ loadSprite scalingFactor filePath = do
 -- Carregar character sprites
 loadPlayerSprites :: IO [Picture]
 loadPlayerSprites = mapM (loadSprite characterScaling) 
-  [ "./app/character/c_jump_left.bmp"
+  [ "./app/character/c_right.bmp"
+  , "./app/character/c_walk_right_right_leg.bmp"
+  , "./app/character/c_walk_right_left_leg.bmp"
   , "./app/character/c_jump_right.bmp"
   , "./app/character/c_left.bmp"
-  , "./app/character/c_right.bmp"
+  , "./app/character/c_jump_left.bmp"
   , "./app/character/c_walk_left_left_leg.bmp"
   , "./app/character/c_walk_left_right_leg.bmp"
-  , "./app/character/c_walk_right_left_leg.bmp"
-  , "./app/character/c_walk_right_right_leg.bmp"
   ]
+
+playerPositions :: [(Float, Float)]
+playerPositions = [(0,0),(0,0),(0,0),(0,0),(0,0),(0,0),(0,0),(0,0)]
 
 -- Carregar chicken sprites
 loadChickenSprites :: IO [Picture]
@@ -53,6 +56,9 @@ loadChickenSprites = mapM (loadSprite chickenScaling)
   , "./app/chickens/chicken_fly_3.bmp"
   , "./app/chickens/chicken_fly_4.bmp"
   ]
+
+chickenPositions :: [(Float, Float)]
+chickenPositions = [(200,200),(200,200),(200,200),(200,200)]
 
 -- Carregar clouds sprites
 loadCloudSprites :: IO [Picture]
@@ -66,6 +72,9 @@ loadCloudSprites = mapM (loadSprite cloudScaling)
   , "./app/clouds/yellow_cloud.bmp"
   ]
 
+cloudPositions :: [(Float, Float)]
+cloudPositions = [(0,0),(0,0),(0,0),(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar eggs sprites
 loadEggSprites :: IO [Picture]
 loadEggSprites = mapM (loadSprite eggScaling) 
@@ -78,6 +87,9 @@ loadEggSprites = mapM (loadSprite eggScaling)
   , "./app/eggs/eggs_basket.bmp"
   ]
 
+eggPositions :: [(Float, Float)]
+eggPositions = [(0,0),(0,0),(0,0),(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar elements sprites
 loadElementSprites :: IO [Picture]
 loadElementSprites = mapM (loadSprite elementsScaling) 
@@ -88,6 +100,9 @@ loadElementSprites = mapM (loadSprite elementsScaling)
   , "./app/elements/milk.bmp"
   ]
 
+elementPositions :: [(Float, Float)]
+elementPositions = [(0,0),(0,0),(0,0),(0,0),(0,0)] 
+
 -- Carregar mountains sprites
 loadMountainSprites :: IO [Picture]
 loadMountainSprites = mapM (loadSprite mountainScaling) 
@@ -97,6 +112,9 @@ loadMountainSprites = mapM (loadSprite mountainScaling)
   , "./app/mountains/choco_mountain.bmp"
   , "./app/mountains/mountains.bmp"
   ]
+
+mountainPositions :: [(Float, Float)]
+mountainPositions = [(0,0),(0,0),(0,0),(0,0),(0,0)]
 
 -- Carregar platforms sprites
 loadPlatformSprites :: IO [Picture]
@@ -110,6 +128,9 @@ loadPlatformSprites = mapM (loadSprite platformScaling)
   , "./app/platforms/platform.bmp"
   ]
 
+platformPositions :: [(Float, Float)]
+platformPositions = [(0,0),(0,0),(0,0),(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar sky sprites
 loadSkySprites :: IO [Picture]
 loadSkySprites = mapM (loadSprite skyScaling) 
@@ -119,12 +140,18 @@ loadSkySprites = mapM (loadSprite skyScaling)
   , "./app/sky/cotton_cloud_middle.bmp"
   ]
 
+skyPositions :: [(Float, Float)]
+skyPositions = [(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar spikes sprites
 loadSpikeSprites :: IO [Picture]
 loadSpikeSprites = mapM (loadSprite wallScaling) 
   [ "./app/spikes/choco_spike_2.bmp"
   , "./app/spikes/choco_spike.bmp"
   ]
+
+spikePositions :: [(Float, Float)]
+spikePositions = [(0,0),(0,0)]
 
 -- Carregar tiles sprites
 loadTileSprites :: IO [Picture]
@@ -136,6 +163,9 @@ loadTileSprites = mapM (loadSprite tileScaling)
   , "./app/tiles/choco_bar.bmp"
   ]
 
+tilePositions :: [(Float, Float)]
+tilePositions = [(0,0),(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar trees sprites
 loadTreeSprites :: IO [Picture]
 loadTreeSprites = mapM (loadSprite treeScaling) 
@@ -146,6 +176,9 @@ loadTreeSprites = mapM (loadSprite treeScaling)
   , "./app/trees/sakura_mochi.bmp"
   ]
 
+treePositions :: [(Float, Float)]
+treePositions = [(0,0),(0,0),(0,0),(0,0),(0,0)]
+
 -- Carregar walls sprites
 loadWallSprites :: IO [Picture]
 loadWallSprites = mapM (loadSprite wallScaling) 
@@ -153,11 +186,17 @@ loadWallSprites = mapM (loadSprite wallScaling)
   , "./app/walls/choco_wall_small.bmp"
   ]
 
+wallPositions :: [(Float, Float)]
+wallPositions = [(0,0),(0,0)]  
+
 -- Carregar water sprites
 loadWaterSprites :: IO [Picture]
 loadWaterSprites = mapM (loadSprite waterScaling) 
   [ "./app/water/choco_water.bmp"
   ]
+
+waterPositions :: [(Float, Float)]
+waterPositions = [(0,0)]
 
 -- Definição de tipos de dados para os elementos do jogo
 data GameEntity = GameEntity
@@ -199,22 +238,21 @@ initialState = do
   wallSprites <- loadWallSprites
   waterSprites <- loadWaterSprites
 
-  let initialPositions = [(-400, -130), (-200, 100), (-250, 250), (0, 150), (-250, -150), (0, 100), (-400, -250), (0, 0), (300, 70), (0, 0), (-200, -90), (300, -70), (0, -270)]
 
   return $ GameState
-    { playerList = [GameEntity (head playerSprites) (head initialPositions)]
-    , chickenList = [GameEntity (head chickenSprites) (initialPositions !! 1)]
-    , cloudList = [GameEntity (head cloudSprites) (initialPositions !! 2)]
-    , eggList = [GameEntity (head eggSprites) (initialPositions !! 3)]
-    , elementList = [GameEntity (head elementSprites) (initialPositions !! 4)]
-    , mountainList = [GameEntity (head mountainSprites) (initialPositions !! 5)]
-    , platformList = [GameEntity (head platformSprites) (initialPositions !! 6)]
-    , skyList = [GameEntity (head skySprites) (initialPositions !! 7)]
-    , spikeList = [GameEntity (head spikeSprites) (initialPositions !! 8)]
-    , tileList = [GameEntity (head tileSprites) (initialPositions !! 9)]
-    , treeList = [GameEntity (head treeSprites) (initialPositions !! 10)]
-    , wallList = [GameEntity (head wallSprites) (initialPositions !! 11)]
-    , waterList = [GameEntity (head waterSprites) (initialPositions !! 12)]
+    { playerList = [GameEntity (head playerSprites) (head playerPositions)]
+    , chickenList = [GameEntity (head chickenSprites) (head chickenPositions)]
+    , cloudList = zipWith (\sprite pos -> GameEntity sprite pos) cloudSprites cloudPositions
+    , eggList = zipWith (\sprite pos -> GameEntity sprite pos) eggSprites eggPositions
+    , elementList = zipWith (\sprite pos -> GameEntity sprite pos) elementSprites elementPositions
+    , mountainList = zipWith (\sprite pos -> GameEntity sprite pos) mountainSprites mountainPositions
+    , platformList = zipWith (\sprite pos -> GameEntity sprite pos) platformSprites platformPositions
+    , skyList = zipWith (\sprite pos -> GameEntity sprite pos) skySprites skyPositions
+    , spikeList = zipWith (\sprite pos -> GameEntity sprite pos) spikeSprites spikePositions
+    , tileList = zipWith (\sprite pos -> GameEntity sprite pos) tileSprites tilePositions
+    , treeList = zipWith (\sprite pos -> GameEntity sprite pos) treeSprites treePositions
+    , wallList = zipWith (\sprite pos -> GameEntity sprite pos) wallSprites wallPositions
+    , waterList = zipWith (\sprite pos -> GameEntity sprite pos) waterSprites waterPositions
     }
 
 -- Função para desenhar uma entidade de jogo na tela
