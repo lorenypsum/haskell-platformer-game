@@ -18,9 +18,21 @@ characterScaling = 3
 platformScaling = 2.5
 tileScaling = 2.5
 
+-- Constantes de física
+gravity :: Float
+gravity = 100
+
 -- Velocidade de movimento do jogador, em pixels por frame
 playerMovementSpeed :: Float
 playerMovementSpeed = 5
+
+-- Velocidade de salto do jogador, em pixels por frame
+playerJumpSpeed :: Float
+playerJumpSpeed = 30
+
+-- Altura máxima que o jogador pode alcançar durante o pulo
+maxJumpHeight :: Float
+maxJumpHeight = 100  -- Ajuste conforme necessário
 
 -- Função para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
@@ -50,7 +62,8 @@ data GameState = GameState
   { background :: Picture,
     platformList :: [GameEntity],
     player :: GameEntity,
-    playerVelocity :: (Float, Float)  -- Velocidade do jogador (vx, vy)
+    playerVelocity :: (Float, Float),  -- Velocidade do jogador (vx, vy)
+    playerJumping :: Bool              -- Indica se o jogador está pulando
   }
 
 -- Estado inicial do jogo
@@ -72,7 +85,8 @@ initialState = do
       { background = backgroundPicture,
         platformList = platformEntities ++ tileEntities,
         player = playerEntity,
-        playerVelocity = (0, 0)  -- Inicialmente o jogador está parado
+        playerVelocity = (0, 0), -- Inicialmente o jogador está parado
+        playerJumping = False  -- Inicialmente o jogador não está pulando
       }
 
 -- Função para transformar coordenadas para o sistema com origem no canto inferior esquerdo
@@ -97,15 +111,16 @@ handleEvent (EventKey key keyState _ _) state =
   case keyState of
     Down ->
       case key of
-        SpecialKey KeyUp -> return $ state { playerVelocity = (vx, playerMovementSpeed) }
-        SpecialKey KeyDown -> return $ state { playerVelocity = (vx, -playerMovementSpeed) }
+        SpecialKey KeyUp -> do
+          let (vx, vy) = playerVelocity state
+          if vy == 0  -- Verifica não está pulando
+            then return $ state { playerVelocity = (vx, playerJumpSpeed) }  -- Inicia o pulo
+            else return state  -- Ignora se já estiver pulando
         SpecialKey KeyLeft -> return $ state { playerVelocity = (-playerMovementSpeed, vy) }
         SpecialKey KeyRight -> return $ state { playerVelocity = (playerMovementSpeed, vy) }
         _ -> return state
     Up ->
       case key of
-        SpecialKey KeyUp -> return $ state { playerVelocity = (vx, 0) }
-        SpecialKey KeyDown -> return $ state { playerVelocity = (vx, 0) }
         SpecialKey KeyLeft -> return $ state { playerVelocity = (0, vy) }
         SpecialKey KeyRight -> return $ state { playerVelocity = (0, vy) }
         _ -> return state
@@ -114,19 +129,18 @@ handleEvent (EventKey key keyState _ _) state =
 handleEvent _ state = return state
 
 -- Função para atualizar o estado do jogo
-updatePlayerMoviment :: Float -> GameState -> IO GameState
-updatePlayerMoviment _deltaTime state = do
+updateGame :: Float -> GameState -> IO GameState
+updateGame deltaTime state = do
   let (vx, vy) = playerVelocity state
       (px, py) = entityPosition (player state)
+      -- Aplica a gravidade se o jogador estiver no ar
+      vy' = if py <= 130 then vy else vy - gravity * deltaTime
       -- Calcula a nova posição do jogador com base na velocidade e no tempo
-      newPlayerPos = (px + vx, py + vy)
+      newPlayerPos = (px + vx, py + vy')
+      -- Verifica se o jogador ultrapassou a altura máxima de pulo
+      updatedVy = if py >= maxJumpHeight then 0 else vy'
       updatedPlayer = (player state) { entityPosition = newPlayerPos }
-  return $ state { player = updatedPlayer }
-
-updateGame :: Float -> GameState -> IO GameState
---chamar a função update
-updateGame deltaTime state = do
-  updatePlayerMoviment deltaTime state
+  return $ state { player = updatedPlayer, playerVelocity = (vx, updatedVy) }
 
 -- Função principal do jogo
 main :: IO ()
