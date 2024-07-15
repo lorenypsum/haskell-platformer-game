@@ -1,5 +1,7 @@
 -- Importação dos Módulos
 import Graphics.Gloss
+import Graphics.Gloss.Interface.IO.Game
+import Control.Exception (handle)
 
 -- Constantes para largura e altura da tela
 screenWidth, screenHeight :: Int
@@ -8,40 +10,23 @@ screenHeight = 650
 
 -- Constante para título da tela
 screenTitle :: String
-screenTitle = "Cueio Lalao"
+screenTitle = "Platformer"
 
 -- Constantes para escalamento dos sprites
-platformScaling, eggScaling, characterScaling, chickenScaling :: Float
--- cloudScaling,  mountainScaling, elementsScaling, skyScaling, tileScaling, treeScaling, wallScaling, waterScaling :: Float
-platformScaling = 3
-eggScaling = 0.2
-characterScaling = 5
-chickenScaling = 5
--- cloudScaling = 2
--- mountainScaling = 1
--- elementsScaling = 5
--- skyScaling = 1
--- tileScaling = 5
--- treeScaling = 5
--- wallScaling = 5
--- waterScaling = 6
+characterScaling, platformScaling, tileScaling :: Float
+characterScaling = 3
+platformScaling = 2.5
+tileScaling = 2.5
 
--- Função genérica para carregar e escalar sprites a partir de arquivos BMP
+-- Velocidade de movimento do jogador, em pixels por frame
+playerMovementSpeed :: Float
+playerMovementSpeed = 5
+
+-- Função para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
 loadSprite scalingFactor filePath = do
   sprite <- loadBMP filePath
   return $ scale scalingFactor scalingFactor sprite
-
--- -- -- Função para carregar e escalar o background
--- loadBackground :: IO Picture
--- loadBackground = do
---   bg <- loadBMP "./app/background/background.bmp"
---   let scaleX = fromIntegral screenWidth / bmpWidth
---       scaleY = fromIntegral screenHeight / bmpHeight
---   return $ scale scaleX scaleY bg
---   where
---     bmpWidth = 797 -- substitua com a largura real da imagem de background
---     bmpHeight = 510 -- substitua com a altura real da imagem de background
 
 -- Função para carregar e escalar o background
 loadBackground :: IO Picture
@@ -54,203 +39,6 @@ loadBackground = do
   return $ scale scaleX scaleY bg
 
 
--- -- Carregar background
--- loadBackground :: IO Picture
--- loadBackground = loadSprite 1 "./app/background/background.bmp"
-
--- Carregar platforms sprites
-loadPlatformSprites :: IO [Picture]
-loadPlatformSprites =
-  mapM
-    (loadSprite platformScaling)
-    [ "./app/platforms/choco_plat_big_flat.bmp",
-      "./app/platforms/choco_plat_big.bmp",
-      "./app/platforms/choco_plat_small_flat.bmp",
-      "./app/platforms/choco_plat_small.bmp",
-      "./app/platforms/choco_platform.bmp",
-      "./app/platforms/platform.bmp"
-    ]
-
-platformPositions :: [(Float, Float)]
-platformPositions = [(50, 50), (-200, -100), (300, -150), (200, 0), (300, -270), (-300, -270)]
-
--- Carregar eggs sprites
-loadEggSprites :: IO [Picture]
-loadEggSprites =
-  mapM
-    (loadSprite eggScaling)
-    [ "./app/eggs/easter_egg_1.bmp"
-      -- "./app/eggs/easter_egg_2.bmp",
-      -- "./app/eggs/easter_egg_3.bmp",
-      -- "./app/eggs/easter_egg_4.bmp",
-      -- "./app/eggs/easter_egg_5.bmp",
-      -- "./app/eggs/easter_egg_rabbit.bmp",
-      -- "./app/eggs/eggs_basket.bmp"
-    ]
-
-eggPositions :: [(Float, Float)]
-eggPositions = [(350, 0)
-  -- , (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)
-  ]
-
--- Carregar character sprites
-loadPlayerSprites :: IO [Picture]
-loadPlayerSprites =
-  mapM
-    (loadSprite characterScaling)
-    [ "./app/character/c_right.bmp",
-      "./app/character/c_walk_right_right_leg.bmp",
-      "./app/character/c_walk_right_left_leg.bmp",
-      "./app/character/c_jump_right.bmp",
-      "./app/character/c_left.bmp",
-      "./app/character/c_jump_left.bmp",
-      "./app/character/c_walk_left_left_leg.bmp",
-      "./app/character/c_walk_left_right_leg.bmp"
-    ]
-
-playerPositions :: [(Float, Float)]
-playerPositions = [(-400, -170), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- Carregar chicken sprites
-loadChickenSprites :: IO [Picture]
-loadChickenSprites =
-  mapM
-    (loadSprite chickenScaling)
-    [ "./app/chickens/chicken_fly_1.bmp",
-      "./app/chickens/chicken_fly_2.bmp",
-      "./app/chickens/chicken_fly_3.bmp",
-      "./app/chickens/chicken_fly_4.bmp"
-    ]
-
-chickenPositions :: [(Float, Float)]
-chickenPositions = [(200, 200), (200, 200), (200, 200), (200, 200)]
-
--- -- Carregar clouds sprites
--- loadCloudSprites :: IO [Picture]
--- loadCloudSprites =
---   mapM
---     (loadSprite cloudScaling)
---     [ "./app/clouds/cloud_1.bmp",
---       "./app/clouds/cloud_2.bmp",
---       "./app/clouds/cloud_3.bmp",
---       "./app/clouds/cloud_back.bmp",
---       "./app/clouds/cupcake.bmp",
---       "./app/clouds/props_cloud.bmp",
---       "./app/clouds/yellow_cloud.bmp"
---     ]
-
--- cloudPositions :: [(Float, Float)]
--- cloudPositions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar elements sprites
--- loadElementSprites :: IO [Picture]
--- loadElementSprites =
---   mapM
---     (loadSprite elementsScaling)
---     [ "./app/elements/brigadeiro.bmp",
---       "./app/elements/choco_ball.bmp",
---       "./app/elements/choco_donut.bmp",
---       "./app/elements/donut_strawberry.bmp",
---       "./app/elements/milk.bmp"
---     ]
-
--- elementPositions :: [(Float, Float)]
--- elementPositions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar mountains sprites
--- loadMountainSprites :: IO [Picture]
--- loadMountainSprites =
---   mapM
---     (loadSprite mountainScaling)
---     [ "./app/mountains/anthill_cake_back_1.bmp",
---       "./app/mountains/anthill_cake_back_2.bmp",
---       "./app/mountains/anthill_cake_back_3.bmp",
---       "./app/mountains/choco_mountain.bmp",
---       "./app/mountains/mountains.bmp"
---     ]
-
--- mountainPositions :: [(Float, Float)]
--- mountainPositions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar sky sprites
--- loadSkySprites :: IO [Picture]
--- loadSkySprites =
---   mapM
---     (loadSprite skyScaling)
---     [ "./app/sky/cloud_sky.bmp",
---       "./app/sky/cotton_cloud_back.bmp",
---       "./app/sky/cotton_cloud_front.bmp",
---       "./app/sky/cotton_cloud_middle.bmp"
---     ]
-
--- skyPositions :: [(Float, Float)]
--- skyPositions = [(0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar spikes sprites
--- loadSpikeSprites :: IO [Picture]
--- loadSpikeSprites =
---   mapM
---     (loadSprite wallScaling)
---     [ "./app/spikes/choco_spike_2.bmp",
---       "./app/spikes/choco_spike.bmp"
---     ]
-
--- spikePositions :: [(Float, Float)]
--- spikePositions = [(0, 0), (0, 0)]
-
--- -- Carregar tiles sprites
--- loadTileSprites :: IO [Picture]
--- loadTileSprites =
---   mapM
---     (loadSprite tileScaling)
---     [ "./app/tiles/choco_small_flat_platform.bmp",
---       "./app/tiles/choco_tile.bmp",
---       "./app/tiles/cookie_tile.bmp",
---       "./app/tiles/strawberry_bar.bmp",
---       "./app/tiles/choco_bar.bmp"
---     ]
-
--- tilePositions :: [(Float, Float)]
--- tilePositions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar trees sprites
--- loadTreeSprites :: IO [Picture]
--- loadTreeSprites =
---   mapM
---     (loadSprite treeScaling)
---     [ "./app/trees/choco_lollipop.bmp",
---       "./app/trees/choco_tree_2.bmp",
---       "./app/trees/choco_tree_3.bmp",
---       "./app/trees/choco_tree.bmp",
---       "./app/trees/sakura_mochi.bmp"
---     ]
-
--- treePositions :: [(Float, Float)]
--- treePositions = [(0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
-
--- -- Carregar walls sprites
--- loadWallSprites :: IO [Picture]
--- loadWallSprites =
---   mapM
---     (loadSprite wallScaling)
---     [ "./app/walls/choco_wall_big.bmp",
---       "./app/walls/choco_wall_small.bmp"
---     ]
-
--- wallPositions :: [(Float, Float)]
--- wallPositions = [(0, 0), (0, 0)]
-
--- -- Carregar water sprites
--- loadWaterSprites :: IO [Picture]
--- loadWaterSprites =
---   mapM
---     (loadSprite waterScaling)
---     [ "./app/water/choco_water.bmp"
---     ]
-
--- waterPositions :: [(Float, Float)]
--- waterPositions = [(0, 0)]
-
 -- Definição de tipos de dados para os elementos do jogo
 data GameEntity = GameEntity
   { entitySprite :: Picture,
@@ -261,99 +49,88 @@ data GameEntity = GameEntity
 data GameState = GameState
   { background :: Picture,
     platformList :: [GameEntity],
-    eggList :: [GameEntity],
-    chickenList :: [GameEntity],
-    playerList :: [GameEntity]
-    -- cloudList :: [GameEntity],
-    -- elementList :: [GameEntity],
-    -- mountainList :: [GameEntity],
-    -- skyList :: [GameEntity],
-    -- spikeList :: [GameEntity],
-    -- tileList :: [GameEntity],
-    -- treeList :: [GameEntity],
-    -- wallList :: [GameEntity],
-    -- waterList :: [GameEntity]
+    player :: GameEntity,
+    playerVelocity :: (Float, Float)  -- Velocidade do jogador (vx, vy)
   }
 
 -- Estado inicial do jogo
 initialState :: IO GameState
 initialState = do
   backgroundPicture <- loadBackground
-  platformSprites <- loadPlatformSprites
-  eggSprites <- loadEggSprites
-  chickenSprites <- loadChickenSprites
-  playerSprites <- loadPlayerSprites
-  -- cloudSprites <- loadCloudSprites
-  -- elementSprites <- loadElementSprites
-  -- mountainSprites <- loadMountainSprites
-  -- skySprites <- loadSkySprites
-  -- spikeSprites <- loadSpikeSprites
-  -- tileSprites <- loadTileSprites
-  -- treeSprites <- loadTreeSprites
-  -- wallSprites <- loadWallSprites
-  -- waterSprites <- loadWaterSprites
+  playerSprite <- loadSprite characterScaling "./app/character/c_right.bmp"
+  platformSprite <- loadSprite platformScaling "./app/platforms/platform.bmp"
+  tileSprite <- loadSprite tileScaling "./app/tiles/choco_tile.bmp"
+
+  let playerEntity = GameEntity playerSprite (64, 130)
+      platformEntities = [ GameEntity platformSprite (x * platformScaling, 50) | x <- [0, 192 .. 1248] ]
+      tile_x = (platformScaling * 120) - 64
+      tilePositions = [(tile_x, 150), (tile_x * 2, 150), (tile_x * 3, 150)]
+      tileEntities = map (GameEntity tileSprite) tilePositions
 
   return $
     GameState
       { background = backgroundPicture,
-        platformList = zipWith GameEntity platformSprites platformPositions,
-        eggList = zipWith GameEntity eggSprites eggPositions,
-        chickenList = [GameEntity (head chickenSprites) (head chickenPositions)],
-        playerList = [GameEntity (head playerSprites) (head playerPositions)]
-        -- cloudList = zipWith (\sprite pos -> GameEntity sprite pos) cloudSprites cloudPositions,
-        -- elementList = zipWith (\sprite pos -> GameEntity sprite pos) elementSprites elementPositions,
-        -- mountainList = zipWith (\sprite pos -> GameEntity sprite pos) mountainSprites mountainPositions,
-        -- skyList = zipWith (\sprite pos -> GameEntity sprite pos) skySprites skyPositions,
-        -- spikeList = zipWith (\sprite pos -> GameEntity sprite pos) spikeSprites spikePositions,
-        -- tileList = zipWith (\sprite pos -> GameEntity sprite pos) tileSprites tilePositions,
-        -- treeList = zipWith (\sprite pos -> GameEntity sprite pos) treeSprites treePositions,
-        -- wallList = zipWith (\sprite pos -> GameEntity sprite pos) wallSprites wallPositions,
-        -- waterList = zipWith (\sprite pos -> GameEntity sprite pos) waterSprites waterPositions
+        platformList = platformEntities ++ tileEntities,
+        player = playerEntity,
+        playerVelocity = (0, 0)  -- Inicialmente o jogador está parado
       }
+
+-- Função para transformar coordenadas para o sistema com origem no canto inferior esquerdo
+toBottomLeftCoords :: (Float, Float) -> (Float, Float)
+toBottomLeftCoords (x, y) = (x - fromIntegral screenWidth / 2, y - fromIntegral screenHeight / 2)
 
 -- Função para desenhar uma entidade de jogo na tela
 drawEntity :: GameEntity -> Picture
-drawEntity entity = uncurry translate (entityPosition entity) (entitySprite entity)
-
--- Função para redimensionar o background
-resizeBackground :: Picture -> Float -> Float -> Picture
-resizeBackground bg windowWidth windowHeight =
-  let screenWidth = 1000  -- Largura original da tela
-      screenHeight = 650  -- Altura original da tela
-      scaleX = windowWidth / screenWidth
-      scaleY = windowHeight / screenHeight
-  in scale scaleX scaleY bg
+drawEntity entity = uncurry translate (toBottomLeftCoords (entityPosition entity)) (entitySprite entity)
 
 -- Função para renderizar o estado do jogo
 render :: GameState -> Picture
 render state =
-  let scaledBackground = resizeBackground (background state) (fromIntegral screenWidth) (fromIntegral screenHeight)
-  in pictures $
-      scaledBackground : concat
-      [ map drawEntity (platformList state),
-        map drawEntity (eggList state),
-        map drawEntity (playerList state),
-        map drawEntity (chickenList state)
-        -- map drawEntity (cloudList state),
-        -- map drawEntity (elementList state),
-        -- map drawEntity (mountainList state),
-        -- map drawEntity (skyList state),
-        -- map drawEntity (spikeList state),
-        -- map drawEntity (tileList state),
-        -- map drawEntity (treeList state),
-        -- map drawEntity (wallList state),
-        -- map drawEntity (waterList state)
-      ]
+  pictures $
+    [background state] ++
+    map drawEntity (platformList state) ++
+    [drawEntity (player state)]
+
+-- Função para lidar com eventos de teclado
+handleEvent :: Event -> GameState -> IO GameState
+handleEvent (EventKey key keyState _ _) state =
+  case keyState of
+    Down ->
+      case key of
+        SpecialKey KeyUp -> return $ state { playerVelocity = (vx, playerMovementSpeed) }
+        SpecialKey KeyDown -> return $ state { playerVelocity = (vx, -playerMovementSpeed) }
+        SpecialKey KeyLeft -> return $ state { playerVelocity = (-playerMovementSpeed, vy) }
+        SpecialKey KeyRight -> return $ state { playerVelocity = (playerMovementSpeed, vy) }
+        _ -> return state
+    Up ->
+      case key of
+        SpecialKey KeyUp -> return $ state { playerVelocity = (vx, 0) }
+        SpecialKey KeyDown -> return $ state { playerVelocity = (vx, 0) }
+        SpecialKey KeyLeft -> return $ state { playerVelocity = (0, vy) }
+        SpecialKey KeyRight -> return $ state { playerVelocity = (0, vy) }
+        _ -> return state
+  where
+    (vx, vy) = playerVelocity state
+handleEvent _ state = return state
+
+-- Função para atualizar o estado do jogo
+update :: Float -> GameState -> IO GameState
+update _deltaTime state = do
+  let (vx, vy) = playerVelocity state
+      (px, py) = entityPosition (player state)
+      newPlayerPos = (px + vx, py + vy)
+      updatedPlayer = (player state) { entityPosition = newPlayerPos }
+  return $ state { player = updatedPlayer }
 
 -- Função principal do jogo
 main :: IO ()
 main = do
   initialState' <- initialState
-  play
+  playIO
     (InWindow screenTitle (screenWidth, screenHeight) (10, 10))
-    white
+    (makeColorI 155 212 195 255)
     60
     initialState'
-    render
-    (\_ world -> world)
-    (\_ world -> world)
+    (return . render)
+    handleEvent
+    update
