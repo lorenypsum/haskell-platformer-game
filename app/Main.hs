@@ -136,10 +136,10 @@ updateGame deltaTime state = do
       -- Aplica a gravidade se o jogador estiver no ar
       vy' = if py <= 130 then vy else vy - gravity * deltaTime
       -- Calcula a nova posição do jogador com base na velocidade e no tempo
-      newPlayerPos = (px + vx, py + vy')
+      newPy = max 130 (py + vy')  -- Garante que a nova posição não seja menor que 130
       -- Verifica se o jogador ultrapassou a altura máxima de pulo
       updatedVy = if py >= maxJumpHeight then 0 else vy'
-      updatedPlayer = (player state) { entityPosition = newPlayerPos }
+      updatedPlayer = (player state) { entityPosition = (px + vx, newPy) }
   return $ state { player = updatedPlayer, playerVelocity = (vx, updatedVy) }
 
 -- Função principal do jogo
