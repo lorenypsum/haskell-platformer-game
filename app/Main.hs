@@ -1,6 +1,5 @@
 -- Importação dos Módulos
 import Graphics.Gloss
-import Graphics.Gloss.Interface.IO.Game
 
 -- Constantes para largura e altura da tela
 screenWidth, screenHeight :: Int
@@ -257,7 +256,8 @@ initialState = do
 
 -- Função para desenhar uma entidade de jogo na tela
 drawEntity :: GameEntity -> Picture
-drawEntity (GameEntity sprite (x, y)) = translate x y sprite
+drawEntity entity = translate (fst (entityPosition entity)) (snd (entityPosition entity)) (entitySprite entity)
+
 
 -- Função para renderizar o estado do jogo
 render :: GameState -> Picture
