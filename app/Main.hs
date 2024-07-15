@@ -1,7 +1,8 @@
 -- Importação dos Módulos
+
+import Control.Exception (handle)
 import Graphics.Gloss
 import Graphics.Gloss.Interface.IO.Game
-import Control.Exception (handle)
 
 -- Constantes para largura e altura da tela
 screenWidth, screenHeight :: Int
@@ -32,7 +33,7 @@ playerJumpSpeed = 30
 
 -- Altura máxima que o jogador pode alcançar durante o pulo
 maxJumpHeight :: Float
-maxJumpHeight = 100  -- Ajuste conforme necessário
+maxJumpHeight = 100 -- Ajuste conforme necessário
 
 -- Função para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
@@ -50,7 +51,6 @@ loadBackground = do
       scaleY = fromIntegral screenHeight / bmpHeight
   return $ scale scaleX scaleY bg
 
-
 -- Definição de tipos de dados para os elementos do jogo
 data GameEntity = GameEntity
   { entitySprite :: Picture,
@@ -62,8 +62,8 @@ data GameState = GameState
   { background :: Picture,
     platformList :: [GameEntity],
     player :: GameEntity,
-    playerVelocity :: (Float, Float),  -- Velocidade do jogador (vx, vy)
-    playerJumping :: Bool              -- Indica se o jogador está pulando
+    playerVelocity :: (Float, Float), -- Velocidade do jogador (vx, vy)
+    playerJumping :: Bool -- Indica se o jogador está pulando
   }
 
 -- Estado inicial do jogo
@@ -75,7 +75,7 @@ initialState = do
   tileSprite <- loadSprite tileScaling "./app/tiles/choco_tile.bmp"
 
   let playerEntity = GameEntity playerSprite (64, 130)
-      platformEntities = [ GameEntity platformSprite (x * platformScaling, 50) | x <- [0, 192 .. 1248] ]
+      platformEntities = [GameEntity platformSprite (x * platformScaling, 50) | x <- [0, 192 .. 1248]]
       tile_x = (platformScaling * 120) - 64
       tilePositions = [(tile_x, 150), (tile_x * 2, 150), (tile_x * 3, 150)]
       tileEntities = map (GameEntity tileSprite) tilePositions
@@ -86,7 +86,7 @@ initialState = do
         platformList = platformEntities ++ tileEntities,
         player = playerEntity,
         playerVelocity = (0, 0), -- Inicialmente o jogador está parado
-        playerJumping = False  -- Inicialmente o jogador não está pulando
+        playerJumping = False -- Inicialmente o jogador não está pulando
       }
 
 -- Função para transformar coordenadas para o sistema com origem no canto inferior esquerdo
@@ -101,9 +101,9 @@ drawEntity entity = uncurry translate (toBottomLeftCoords (entityPosition entity
 render :: GameState -> Picture
 render state =
   pictures $
-    [background state] ++
-    map drawEntity (platformList state) ++
-    [drawEntity (player state)]
+    [background state]
+      ++ map drawEntity (platformList state)
+      ++ [drawEntity (player state)]
 
 -- Função para lidar com eventos de teclado
 handleEvent :: Event -> GameState -> IO GameState
@@ -113,16 +113,16 @@ handleEvent (EventKey key keyState _ _) state =
       case key of
         SpecialKey KeyUp -> do
           let (vx, vy) = playerVelocity state
-          if vy == 0  -- Verifica não está pulando
-            then return $ state { playerVelocity = (vx, playerJumpSpeed) }  -- Inicia o pulo
-            else return state  -- Ignora se já estiver pulando
-        SpecialKey KeyLeft -> return $ state { playerVelocity = (-playerMovementSpeed, vy) }
-        SpecialKey KeyRight -> return $ state { playerVelocity = (playerMovementSpeed, vy) }
+          if vy == 0 -- Verifica não está pulando
+            then return $ state {playerVelocity = (vx, playerJumpSpeed)} -- Inicia o pulo
+            else return state -- Ignora se já estiver pulando
+        SpecialKey KeyLeft -> return $ state {playerVelocity = (-playerMovementSpeed, vy)}
+        SpecialKey KeyRight -> return $ state {playerVelocity = (playerMovementSpeed, vy)}
         _ -> return state
     Up ->
       case key of
-        SpecialKey KeyLeft -> return $ state { playerVelocity = (0, vy) }
-        SpecialKey KeyRight -> return $ state { playerVelocity = (0, vy) }
+        SpecialKey KeyLeft -> return $ state {playerVelocity = (0, vy)}
+        SpecialKey KeyRight -> return $ state {playerVelocity = (0, vy)}
         _ -> return state
   where
     (vx, vy) = playerVelocity state
@@ -136,11 +136,11 @@ updateGame deltaTime state = do
       -- Aplica a gravidade se o jogador estiver no ar
       vy' = if py <= 130 then vy else vy - gravity * deltaTime
       -- Calcula a nova posição do jogador com base na velocidade e no tempo
-      newPy = max 130 (py + vy')  -- Garante que a nova posição não seja menor que 130
+      newPy = max 130 (py + vy') -- Garante que a nova posição não seja menor que 130
       -- Verifica se o jogador ultrapassou a altura máxima de pulo
       updatedVy = if py >= maxJumpHeight then 0 else vy'
-      updatedPlayer = (player state) { entityPosition = (px + vx, newPy) }
-  return $ state { player = updatedPlayer, playerVelocity = (vx, updatedVy) }
+      updatedPlayer = (player state) {entityPosition = (px + vx, newPy)}
+  return $ state {player = updatedPlayer, playerVelocity = (vx, updatedVy)}
 
 -- Função principal do jogo
 main :: IO ()
