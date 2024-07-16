@@ -32,7 +32,7 @@ playerJumpSpeed = 40
 
 -- Altura máxima que o jogador pode alcançar durante o pulo
 maxJumpHeight :: Float
-maxJumpHeight = 200  -- Ajuste conforme necessário
+maxJumpHeight = 10  -- Ajuste conforme necessário
 
 -- Função para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
@@ -150,7 +150,6 @@ updateGame :: Float -> GameState -> IO GameState
 updateGame deltaTime state = do
   let (vx, vy) = playerVelocity state
       (px, py) = entityPosition (player state)
-      (pw, ph) = entitySize (player state)
 
       -- Aplica a gravidade se o jogador estiver no ar
       vy' = vy - gravity * deltaTime
@@ -192,7 +191,6 @@ updateGame deltaTime state = do
       finalJumping = not isOnGround
 
   return $ state { player = updatedPlayer, playerVelocity = (vx, finalVy'), playerJumping = finalJumping }
-
 
 -- Função principal do jogo
 main :: IO ()
