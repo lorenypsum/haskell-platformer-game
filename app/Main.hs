@@ -191,7 +191,7 @@ updateGame deltaTime state = do
       finalVy' = if isOnGround && vy' < 0 then 0 else finalVy
       finalJumping = not isOnGround
 
-  return $ state { player = updatedPlayer, playerVelocity = (vx, finalVy), playerJumping = finalJumping }
+  return $ state { player = updatedPlayer, playerVelocity = (vx, finalVy'), playerJumping = finalJumping }
 
 
 -- Função principal do jogo
