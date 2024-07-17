@@ -58,5 +58,9 @@ cabal install --only-dependencies
     * Click on the option that appears
     This might be necessary because the language server does not recognize the new dependencies added to the project.
 
+# Bugs
 
+1. The player doesn't fall back when hitting a corner of tile in the air.
+2. The player doesn't fall back when hitting vertically a tile in the air.
+2. Unable to control the jump high.
 	
