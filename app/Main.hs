@@ -57,18 +57,19 @@ data GameEntity = GameEntity
 
 -- Definição do estado do jogo
 data GameState = GameState
-  { background :: Picture,
+  { -- background :: Picture,
     platformList :: [GameEntity],
     tileList :: [GameEntity],
     player :: GameEntity,
     playerVelocity :: (Float, Float),  -- Velocidade do jogador (vx, vy)
-    playerJumping :: Bool              -- Indica se o jogador está pulando
+    playerJumping :: Bool,
+    cameraOffset :: (Float, Float)     -- Offset da câmera              -- Indica se o jogador está pulando
   }
 
 -- Estado inicial do jogo
 initialState :: IO GameState
 initialState = do
-  backgroundPicture <- loadBackground
+  -- backgroundPicture <- loadBackground
   playerSprite <- loadSprite characterScaling "./app/character/c_right.bmp"
   platformSprite <- loadSprite platformScaling "./app/platforms/platform.bmp"
   tileSprite <- loadSprite tileScaling "./app/tiles/choco_tile.bmp"
@@ -82,30 +83,46 @@ initialState = do
 
   return $
     GameState
-      { background = backgroundPicture,
+      { 
+        --background = backgroundPicture,
         platformList = platformEntities, 
         tileList = tileEntities,
         player = playerEntity,
         playerVelocity = (0, 0), -- Inicialmente o jogador está parado
-        playerJumping = False  -- Inicialmente o jogador não está pulando
+        playerJumping = False,  -- Inicialmente o jogador não está pulando
+        cameraOffset = (0, 0)    -- Inicialmente sem offset da câmera
       }
 
 -- Função para transformar coordenadas para o sistema com origem no canto inferior esquerdo
-toBottomLeftCoords :: (Float, Float) -> (Float, Float)
-toBottomLeftCoords (x, y) = (x - fromIntegral screenWidth / 2, y - fromIntegral screenHeight / 2)
+toBottomLeftCoords :: (Float, Float) -> (Float, Float) -> (Float, Float)
+toBottomLeftCoords (cx, cy) (x, y) = (x - fromIntegral screenWidth / 2 - cx, y - fromIntegral screenHeight / 2 - cy)
+
 
 -- Função para desenhar uma entidade de jogo na tela
-drawEntity :: GameEntity -> Picture
-drawEntity entity = uncurry translate (toBottomLeftCoords (entityPosition entity)) (entitySprite entity)
+drawEntity :: (Float, Float) -> GameEntity -> Picture
+drawEntity offset entity = uncurry translate (toBottomLeftCoords offset (entityPosition entity)) (entitySprite entity)
 
 -- Função para renderizar o estado do jogo
 render :: GameState -> Picture
 render state =
-  pictures $
-    [background state] ++
-    map drawEntity (platformList state) ++
-    map drawEntity (tileList state) ++
-    [drawEntity (player state)]
+  let offset = cameraOffset state
+  in pictures $
+    [translate (fst offset) (snd offset) $ background] ++
+    map (drawEntity offset) (platformList state) ++
+    map (drawEntity offset) (tileList state) ++
+    [drawEntity offset (player state)]
+  where
+    background = Blank -- Replace with the actual background picture
+
+-- Função para centralizar a câmera no jogador
+centerCameraOnPlayer :: GameState -> GameState
+centerCameraOnPlayer state =
+  let (px, py) = entityPosition (player state)
+      screenCenterX = px - fromIntegral screenWidth / 2
+      screenCenterY = py - fromIntegral screenHeight / 2
+      offsetX = if screenCenterX < 0 then 0 else screenCenterX
+      offsetY = if screenCenterY < 0 then 0 else screenCenterY
+  in state { cameraOffset = (offsetX, offsetY) }
 
 -- Função para lidar com eventos de teclado
 handleEvent :: Event -> GameState -> IO GameState
@@ -147,6 +164,7 @@ updateGame :: Float -> GameState -> IO GameState
 updateGame deltaTime state = do
   let (vx, vy) = playerVelocity state
       (px, py) = entityPosition (player state)
+      (pw, ph) = entitySize (player state)
 
       -- Aplica a gravidade se o jogador estiver no ar
       vy' = vy - gravity * deltaTime
@@ -187,7 +205,9 @@ updateGame deltaTime state = do
       finalVy' = if isOnGround && vy' < 0 then 0 else finalVy
       finalJumping = not isOnGround
 
-  return $ state { player = updatedPlayer, playerVelocity = (vx, finalVy'), playerJumping = finalJumping }
+  -- Atualiza o estado com a posição do jogador e a câmera centralizada
+  let newState = state { player = updatedPlayer, playerVelocity = (vx, finalVy'), playerJumping = finalJumping }
+  return $ centerCameraOnPlayer newState
 
 -- Função principal do jogo
 main :: IO ()
