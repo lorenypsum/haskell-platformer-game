@@ -62,5 +62,5 @@ cabal install --only-dependencies
 
 1. The player doesn't fall back when hitting a corner of tile in the air.
 2. The player doesn't fall back when hitting vertically a tile in the air.
-2. Unable to control the jump high.
+2. Unable to control the jump height.
 	
