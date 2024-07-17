@@ -28,11 +28,8 @@ playerMovementSpeed = 10
 
 -- Velocidade de salto do jogador, em pixels por frame
 playerJumpSpeed :: Float
-playerJumpSpeed = 40
+playerJumpSpeed = 25 -- controla a altura maxima do pulo
 
--- Altura máxima que o jogador pode alcançar durante o pulo
-maxJumpHeight :: Float
-maxJumpHeight = 10  -- Ajuste conforme necessário
 
 -- Função para carregar e escalar sprites a partir de arquivos BMP
 loadSprite :: Float -> FilePath -> IO Picture
