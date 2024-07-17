@@ -61,4 +61,5 @@ cabal install --only-dependencies
 # Bugs
 
 1. The player doesn't fall back when hitting a corner of tile in the air.
+2. The game doesn't start if the player doesn't jump.
 	
